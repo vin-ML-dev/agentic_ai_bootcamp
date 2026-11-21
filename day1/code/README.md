@@ -8,6 +8,7 @@ An AI agent that investigates a support ticket, proposes a resolution, and (late
 
 ```
 customer-support-agent/
+├── examples/                # 4 small programs to learn LangGraph step by step
 ├── graph.py                 # starter LangGraph workflow
 ├── data/sample_tickets.json # synthetic (fake) ticket data
 ├── requirements.txt         # Python packages
@@ -28,6 +29,17 @@ pip install -r requirements.txt
 
 # 3. Create your own settings file (never commit .env)
 cp .env.example .env             # Windows: copy .env.example .env
+```
+
+## Learn LangGraph first (examples)
+
+Run these in order. Each one adds one new idea.
+
+```bash
+python examples/01_hello_graph.py      # State, one node, START and END
+python examples/02_two_nodes.py        # two nodes, passing data
+python examples/03_decide_in_node.py   # if/else decision inside a node
+python examples/04_ticket_from_file.py # read a ticket file, save the result
 ```
 
 ## Run
