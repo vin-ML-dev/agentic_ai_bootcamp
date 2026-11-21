@@ -1,133 +1,283 @@
 # Day 1: Start Your Customer Support Agent Project
 
-**Today's topics**
+**What we learn today**
 1. What an agent does
-2. The Customer Support Agent and its practice support system
-3. Python setup, GitHub account creation, and basic Git commands
-4. Running a supplied LangGraph workflow with synthetic ticket data
+2. Our project: the Customer Support Agent and its practice support system
+3. Python setup, GitHub account, and basic Git commands
+4. Running a ready-made LangGraph workflow with fake ticket data
 
 ---
 
-## 1. What an Agent Does
+## Words You Will Hear in This Project
 
-An **agent** is a program that does three things:
+| Word | Simple meaning |
+|---|---|
+| **Customer support** | The team that helps customers when they have a problem with an order. |
+| **Ticket** | A customer's complaint or question saved in the system, e.g. "Where is my order?" |
+| **Ticket ID** | A unique number for each ticket, like `T-1001`, so we can find it easily. |
+| **Order** | Something a customer bought from the shop. |
+| **Order ID** | A unique number for each order, like `O-9001`. |
+| **Delivery** | The journey of the order from the shop to the customer's home. |
+| **Policy** | The shop's rules, e.g. "If delivery is more than 5 days late, escalate it." |
+| **Record** | Any saved information in the system – a ticket, an order, or a delivery. |
+| **Ticket note** | A short comment added to a ticket, e.g. "Checked order, it is shipped." |
+| **Ticket status** | The current stage of a ticket, e.g. `open`, `in progress`, `resolved`, `closed`. |
+| **Status change** | Moving a ticket from one stage to another, e.g. `open` → `resolved`. |
+| **Escalation** | Passing a difficult ticket to a senior person or a human team. |
+| **Reviewer** | The person who checks the agent's suggestion. |
+| **Approve / Reject** | Reviewer says **yes** (do it) or **no** (don't do it). |
+| **Synthetic data** | Fake data made for practice. It looks real but belongs to no real person. |
 
-| Step | Meaning | Support example |
-|---|---|---|
-| **Interpret a request** | Understand what the user wants | "Where is my order O-9001?" → customer wants order status |
-| **Use tools** | Call functions to get facts or do work | Look up order O-9001 in the support system |
-| **Complete a task** | Give a final answer or result | "Your order is shipped and arrives tomorrow" |
+---
+
+## 1. What Is an Agent?
+
+Think of a **helper at a shop's customer care desk**.
+
+A customer says: *"Where is my order?"*
+The helper:
+1. **Understands** the question
+2. **Checks** the computer for the order
+3. **Answers** the customer
+
+An **AI agent** does the same thing, but as a program.
+
+```
+   ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+   │   1. UNDERSTAND  │ ──► │   2. USE TOOLS   │ ──► │   3. FINISH      │
+   │   the request    │     │   to get facts   │     │   the task       │
+   └──────────────────┘     └──────────────────┘     └──────────────────┘
+   "Where is my order?"      Look up the order        "Your order arrives
+                                                       tomorrow"
+```
+
+**What is a tool?**
+A tool is just a **Python function** the agent can call, like `get_order_status("O-9001")`.
 
 **Chatbot vs Agent**
 
-- A **chatbot** only replies with text from what it already knows.
-- An **agent** can **check real records** using tools and then act on the result.
-
-> Simple way to remember: **Understand → Use tools → Finish the task**
+| Chatbot | Agent |
+|---|---|
+| Only talks | Talks **and** does work |
+| Answers from what it remembers | **Checks real records** using tools |
+| "Orders usually take 5 days" | "Your order O-9001 was shipped today" |
 
 ---
 
 ## 2. Our Project: The Customer Support Agent
 
-We build **one project** for the whole course and add to it every day.
+### In one line
 
-**The agent handles:**
-- Order-status questions
-- Delayed deliveries
-- Ticket follow-ups
+> We are building a **smart support helper** that reads a customer's problem, checks the records, and **suggests** what to do. A **human** says yes or no before anything is changed.
 
-**What the agent does:**
-1. Checks **ticket, order, delivery, and policy** records
-2. **Asks for missing information** (for example, no order ID)
-3. **Proposes** one of these:
-   - a ticket note
-   - a status change
-   - an escalation
-4. A **human reviewer approves** the change before it is made
+We build **one project** and add a little more to it every day.
 
-> Important: the agent only **proposes**. A human **approves** before any record is changed.
+### What problems does it handle?
+
+- 📦 **Order status** – "Where is my order?"
+- 🚚 **Late delivery** – "My order is late"
+- 🔁 **Follow-up** – "Any update on my old ticket?"
+
+### The whole project in one picture
+
+```
+            ┌─────────────────────────────┐
+            │   Customer sends a ticket   │
+            │   "My order is late"        │
+            └──────────────┬──────────────┘
+                           ▼
+            ┌─────────────────────────────┐
+            │   Agent reads the ticket    │
+            └──────────────┬──────────────┘
+                           ▼
+                ┌─────────────────────┐
+                │ Is any information  │
+                │ missing? (order ID) │
+                └───┬─────────────┬───┘
+                YES │             │ NO
+                    ▼             ▼
+   ┌────────────────────┐   ┌─────────────────────────────┐
+   │ Ask the customer   │   │ Agent checks the records:   │
+   │ for the missing    │   │ ticket, order, delivery,    │
+   │ information        │   │ policy                      │
+   └────────────────────┘   └──────────────┬──────────────┘
+                                           ▼
+                            ┌─────────────────────────────┐
+                            │ Agent SUGGESTS an action:   │
+                            │ • add a ticket note         │
+                            │ • change ticket status      │
+                            │ • escalate (send to human)  │
+                            └──────────────┬──────────────┘
+                                           ▼
+                            ┌─────────────────────────────┐
+                            │ Human reviewer checks it    │
+                            └───────┬───────────────┬─────┘
+                            APPROVE │               │ REJECT
+                                    ▼               ▼
+                   ┌─────────────────────┐   ┌──────────────────┐
+                   │ Record is updated   │   │ Nothing changes  │
+                   │ and checked         │   │                  │
+                   └─────────────────────┘   └──────────────────┘
+```
+
+> 🔑 **Golden rule:** The agent only **suggests**. A **human approves** before any record is changed.
 
 ### The Practice Support System (Sandbox)
 
-We do **not** use real customer accounts. We use a **practice support system** that has:
-- **Synthetic (fake) tickets and orders** – safe to use and share
-- Approved update endpoints – the only allowed ways to change records
-- Audit records – a history of every change
-- Controlled failure examples – to practice handling errors
+We will **never** use real customers' data. Instead we use a **practice system** – like a **flight simulator** for pilots. You can practice safely without real risk.
 
-We will run this practice backend on **Day 4**. Today we only use sample ticket data.
+It has:
+- **Fake tickets and orders** – safe to use and share
+- **Approved ways to update records** – the only allowed doors for changes
+- **Audit records** – a diary of every change made
+- **Planned errors** – so we can practice fixing problems
+
+```
+   ┌──────────────┐   asks for data    ┌───────────────────────────┐
+   │              │ ─────────────────► │  Practice Support System  │
+   │    Agent     │                    │  (fake tickets & orders)  │
+   │              │ ◄───────────────── │                           │
+   └──────────────┘   sends back facts └───────────────────────────┘
+```
+
+We start this practice system on **Day 4**. Today we only use a small file of fake tickets.
 
 ---
 
-## 3. Python Setup, GitHub, and Basic Git
+## 3. Python Setup, GitHub, and Git
 
 ### Python setup
 
 ```bash
-python --version                  # check Python is installed (3.10+)
+python --version                  # check Python is installed (3.10 or newer)
 python -m venv .venv              # create a virtual environment
-source .venv/bin/activate         # activate it (Windows: .venv\Scripts\activate)
-pip install -r requirements.txt   # install packages
+source .venv/bin/activate         # turn it on (Windows: .venv\Scripts\activate)
+pip install -r requirements.txt   # install the packages we need
 ```
 
-A **virtual environment** keeps this project's packages separate from other projects.
+**What is a virtual environment?**
+A separate box for this project's packages, so they don't mix with other projects.
 
-### GitHub account
+### What are Git and GitHub?
+
+- **Git** = a tool on your computer that saves every version of your code, so you can go back anytime.
+- **GitHub** = a website that stores your Git code online, so you can share it and never lose it.
+
+> **Git** saves your code. **GitHub** keeps it online.
+
+### Create a GitHub account
 
 1. Go to **github.com** and sign up
-2. Create a new repository named `customer-support-agent`
-3. We push our work to this repository **at the end of every class**
+2. Click **New repository**, name it `customer-support-agent`
+3. You will upload your work here **at the end of every day**
+
+### How Git saves your work
+
+```
+   ┌─────────────┐   git add   ┌─────────────┐  git commit  ┌─────────────┐  git push  ┌─────────────┐
+   │ Your files  │ ──────────► │  Selected   │ ───────────► │  Saved on   │ ─────────► │  Saved on   │
+   │ (changed)   │             │  files      │              │  your PC    │            │  GitHub     │
+   └─────────────┘             └─────────────┘              └─────────────┘            └─────────────┘
+```
 
 ### Basic Git commands
 
 | Command | What it does |
 |---|---|
-| `git init` | Start tracking a folder with Git |
-| `git status` | See which files changed |
-| `git add .` | Select all changed files for the next commit |
-| `git commit -m "message"` | Save a snapshot with a message |
-| `git remote add origin <url>` | Link the folder to your GitHub repository |
-| `git push -u origin main` | Upload your commits to GitHub |
+| `git init` | Start using Git in this folder |
+| `git status` | Show which files changed |
+| `git add .` | Pick all changed files to save |
+| `git commit -m "message"` | Save a snapshot with a short note |
+| `git remote add origin <url>` | Connect your folder to GitHub |
+| `git push -u origin main` | Upload your saved work to GitHub |
 
-### Keep secrets out of Git
+### Keep secrets out of GitHub 🔒
 
-- Real keys and passwords go in **`.env`** → this file is **never** committed
-- **`.env.example`** shows the setting names with fake values → this file **is** committed
-- **`.gitignore`** tells Git to ignore `.env`
+Passwords and API keys must **never** go online.
+
+| File | What's inside | Upload to GitHub? |
+|---|---|---|
+| `.env` | Your **real** keys | ❌ Never |
+| `.env.example` | **Fake** example values | ✅ Yes |
+| `.gitignore` | List of files Git should ignore (like `.env`) | ✅ Yes |
 
 ---
 
-## 4. Running a Supplied LangGraph Workflow
+## 4. Running a LangGraph Workflow
 
-**LangGraph** lets us build an agent as a **graph**: a set of steps connected by arrows.
+### What is LangGraph?
 
-| Word | Meaning |
-|---|---|
-| **State** | The information shared between steps (ticket ID, ticket, next step) |
-| **Node** | One step – a normal Python function |
-| **Edge** | An arrow saying which step runs next |
-| **START / END** | Where the graph begins and finishes |
+**LangGraph** helps us build an agent as a **flowchart of steps**.
 
-**Our starter graph:**
+Each box is a step. Arrows show which step runs next.
+
+### 4 words to know
+
+| Word | Simple meaning | In our project |
+|---|---|---|
+| **State** | A notebook shared by all steps | ticket ID, ticket, next step |
+| **Node** | One step (a Python function) | `read_ticket`, `propose_next_step` |
+| **Edge** | An arrow from one step to the next | `read_ticket → propose_next_step` |
+| **START / END** | Where it begins and stops | — |
+
+### Our starter graph
 
 ```
-START → read_ticket → propose_next_step → END
+   ┌─────────┐     ┌───────────────┐     ┌─────────────────────┐     ┌───────┐
+   │  START  │ ──► │  read_ticket  │ ──► │  propose_next_step  │ ──► │  END  │
+   └─────────┘     └───────────────┘     └─────────────────────┘     └───────┘
+                    Opens the ticket       Decides what to do
+                    from the file          next
 ```
 
-- `read_ticket` – loads the ticket from `data/sample_tickets.json`
-- `propose_next_step` – decides what the agent should do next
-- The result is saved to `outputs/next_step.json`
+### How the State (notebook) fills up
 
-Today the decision uses simple rules. On **Day 2** we add an AI model, and on **Day 5** we build graphs ourselves in detail.
+```
+   At START                 After read_ticket           After propose_next_step
+   ┌──────────────────┐     ┌──────────────────┐        ┌──────────────────────────┐
+   │ ticket_id: T-1001│     │ ticket_id: T-1001│        │ ticket_id: T-1001        │
+   │ ticket:    ?     │ ──► │ ticket:   {...}  │ ─────► │ ticket:   {...}          │
+   │ next_step: ?     │     │ next_step: ?     │        │ next_step: "Look up the  │
+   └──────────────────┘     └──────────────────┘        │            order status" │
+                                                        └──────────────────────────┘
+```
 
-**Sample tickets and their proposed next step:**
+### How `propose_next_step` decides
 
-| Ticket | Message | Proposed next step |
+```
+                    ┌──────────────────────┐
+                    │  Is order ID empty?  │── YES ──► Ask the customer for their order ID
+                    └──────────┬───────────┘
+                               │ NO
+                               ▼
+                    ┌──────────────────────┐
+                    │ Says "late"/"delay"? │── YES ──► Check delivery & policy, suggest escalation
+                    └──────────┬───────────┘
+                               │ NO
+                               ▼
+                    ┌──────────────────────┐
+                    │Says "follow"/"update"│── YES ──► Check old notes, suggest a ticket note
+                    └──────────┬───────────┘
+                               │ NO
+                               ▼
+                    ┌──────────────────────┐
+                    │Says "status"/"where"?│── YES ──► Look up the order status
+                    └──────────┬───────────┘
+                               │ NO
+                               ▼
+                    Send to a human support agent
+```
+
+Today this uses **simple rules** (keywords). From **Day 2**, an AI model will help make this decision.
+
+### Our fake tickets
+
+| Ticket | Customer says | Agent suggests |
 |---|---|---|
 | T-1001 | What is the status of my order? | Look up the order status |
-| T-1002 | My delivery is late | Check delivery and delay policy, propose escalation |
-| T-1003 | Following up on my ticket | Check previous notes, propose a ticket note |
-| T-1004 | Where is my order? (no order ID) | Ask the customer for their order ID |
+| T-1002 | My delivery is late | Check delivery & policy, suggest escalation |
+| T-1003 | Any update? I am following up | Check old notes, suggest a ticket note |
+| T-1004 | Where is my order? *(no order ID)* | Ask the customer for their order ID |
 
 ---
 
@@ -135,24 +285,24 @@ Today the decision uses simple rules. On **Day 2** we add an AI model, and on **
 
 1. Create the project folder and virtual environment
 2. Install packages: `pip install -r requirements.txt`
-3. Copy settings: `cp .env.example .env`
-4. Run the graph on a sample ticket:
+3. Make your settings file: `cp .env.example .env`
+4. Run the graph on one ticket:
    ```bash
    python graph.py T-1001
    ```
-5. Open `outputs/next_step.json` and check the saved next step
-6. Run it again with `T-1002`, `T-1003`, and `T-1004`
+5. Open `outputs/next_step.json` and see the saved next step
+6. Try the other tickets: `T-1002`, `T-1003`, `T-1004`
 
 ---
 
 ## Git: Commit and Push
 
-Commit the starter graph, synthetic sample data, README, dependencies, and example environment file — **without credentials**.
+Upload the starter graph, fake ticket data, README, packages list, and example settings file — **no real keys**.
 
 ```bash
 git init
 git add graph.py data/ README.md requirements.txt .env.example .gitignore
-git status                        # make sure .env is NOT listed
+git status                        # check that .env is NOT in the list
 git commit -m "Day 1: starter graph and sample tickets"
 git branch -M main
 git remote add origin https://github.com/<your-username>/customer-support-agent.git
@@ -163,8 +313,8 @@ git push -u origin main
 
 ## Quick Recap
 
-- An agent **interprets a request, uses tools, and completes a task**
-- Our agent **proposes** support actions; a **human approves** record changes
-- We use a **practice support system** with fake data, never real customers
-- A LangGraph graph is made of **state, nodes, and edges**
-- Every class ends with a **commit and push**, and `.env` is **never** committed
+- An agent **understands → uses tools → finishes the task**
+- Our agent **suggests** support actions; a **human approves** changes
+- We practice on a **fake support system**, never real customers
+- LangGraph = **State** (notebook) + **Nodes** (steps) + **Edges** (arrows)
+- Save and upload your work every day; **never** upload `.env`
