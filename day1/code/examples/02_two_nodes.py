@@ -40,6 +40,6 @@ builder.add_edge("add_greeting", END)
 graph = builder.compile()
 
 # We only give "name" at the start. "message" is filled by the graph.
-result = graph.invoke({"name": "riya"})
+result = graph.invoke({"name": "john"})
 
-print(result)  # {'name': 'RIYA', 'message': 'Hello, RIYA!'}
+print(result)  

@@ -27,7 +27,7 @@ class State(TypedDict):
 
 # Node 1: find the ticket in the JSON file
 def load_ticket(state: State) -> dict:
-    tickets = json.loads(Path("data/sample_tickets.json").read_text())  # list of dicts
+    tickets = json.loads(Path("../data/sample_tickets.json").read_text())  # list of dicts
 
     for ticket in tickets:
         if ticket["ticket_id"] == state["ticket_id"]:

@@ -12,26 +12,36 @@ from typing import TypedDict
 from langgraph.graph import StateGraph, START, END
 
 
-# State = the data shared inside the graph (here, only one field)
+# State = the data shared inside the graph
 class State(TypedDict):
     message: str
 
 
 # Node = a normal Python function
-# It gets the state and returns the field it wants to update
 def say_hello(state: State) -> dict:
+    # Use the user's message if provided; otherwise use the default
+    user_message = state.get("message", "").strip()
+
+    if user_message:
+        return {"message": user_message}
+
     return {"message": "Hello from LangGraph!"}
 
 
 # Build the graph
-builder = StateGraph(State)              # 1. create a graph that uses our State
-builder.add_node("say_hello", say_hello) # 2. add the node (name, function)
-builder.add_edge(START, "say_hello")     # 3. START  -> say_hello
-builder.add_edge("say_hello", END)       # 4. say_hello -> END
+builder = StateGraph(State)
 
-graph = builder.compile()                # 5. make it ready to run
+builder.add_node("say_hello", say_hello)
+builder.add_edge(START, "say_hello")
+builder.add_edge("say_hello", END)
 
-# Run the graph with a starting state
-result = graph.invoke({"message": ""})
+graph = builder.compile()
 
-print(result)  # {'message': 'Hello from LangGraph!'}
+
+# Get input from the user
+user_input = input("Enter your message: ")
+
+# Run the graph
+result = graph.invoke({"message": user_input})
+
+print("\nOutput:", result["message"])
