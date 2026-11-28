@@ -1,0 +1,26 @@
+[
+  {
+    "ticket_id": "T-1001",
+    "customer_id": "C-501",
+    "order_id": "O-9001",
+    "message": "Hi, what is the status of my order O-9001?"
+  },
+  {
+    "ticket_id": "T-1002",
+    "customer_id": "C-502",
+    "order_id": "O-9002",
+    "message": "My delivery is late. It was supposed to arrive 3 days ago."
+  },
+  {
+    "ticket_id": "T-1003",
+    "customer_id": "C-503",
+    "order_id": "O-9003",
+    "message": "Any update on my previous ticket? I am following up."
+  },
+  {
+    "ticket_id": "T-1004",
+    "customer_id": "C-504",
+    "order_id": null,
+    "message": "Where is my order?"
+  }
+]
